@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overleaf AI Helper</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Overleaf AI Helper</h1>
+      <p id="ctx-meta">No selection loaded.</p>
+      <p class="muted">快捷键：Alt+1..8（侧栏内）| 全局快捷键可在 chrome://extensions/shortcuts 配置</p>
+    </header>
+
+    <section class="card">
+      <h2>操作区</h2>
+      <div class="ops-grid">
+        <button data-task="rewrite">学术改写</button>
+        <button data-task="compress">压缩</button>
+        <button data-task="expand">扩写</button>
+        <button data-task="logic_enhance">逻辑增强</button>
+        <button data-task="proofread">纠错</button>
+        <button data-task="translate_literal">中译英-忠实翻译</button>
+        <button data-task="translate_academic">中译英-学术重写</button>
+        <button data-task="rebuttal">审稿回复</button>
+      </div>
+      <label>Reviewer Comment（审稿意见）</label>
+      <textarea id="reviewerComment" placeholder="粘贴 reviewer comment；审稿回复模式下可单独使用"></textarea>
+      <label><input id="includeRecentStyle" type="checkbox" /> 参考最近风格（手动启用）</label>
+      <div class="actions-row">
+        <button id="refresh-context">刷新上下文</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>LaTeX 辅助</h2>
+      <textarea id="latexInput" placeholder="示例：目标函数最小化投资成本与运行成本之和；或粘贴 CSV/TSV；或粘贴错误日志"></textarea>
+      <div class="ops-grid">
+        <button data-task="latex_formula">公式助手</button>
+        <button data-task="latex_table">表格助手</button>
+        <button data-task="latex_error_help">报错辅助</button>
+      </div>
+      <label><input id="includeErrorContext" type="checkbox" checked /> 自动读取页面可见编译报错上下文</label>
+    </section>
+
+    <section class="card">
+      <h2>结果区</h2>
+      <div class="result-head">
+        <span id="status">等待操作</span>
+      </div>
+      <label>原文</label>
+      <textarea id="original" readonly></textarea>
+      <label>建议稿</label>
+      <textarea id="suggested"></textarea>
+      <label>差异高亮</label>
+      <div id="diff" class="diff-box"></div>
+      <div id="rebuttalBox" class="rebuttal-box hidden">
+        <div class="tab-row">
+          <button id="tab-response" class="tab-btn active" type="button">Response Letter</button>
+          <button id="tab-revised" class="tab-btn" type="button">Revised Manuscript</button>
+        </div>
+        <textarea id="rebuttalOutput"></textarea>
+      </div>
+      <p id="errorDiagnosis" class="muted"></p>
+      <p id="rationale" class="muted"></p>
+      <ul id="warnings"></ul>
+      <div class="actions-row">
+        <button id="replace-btn">替换选中内容</button>
+        <button id="insert-btn">插入到光标后</button>
+        <button id="copy-btn">复制到剪贴板</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>最近任务</h2>
+      <div class="actions-row">
+        <button id="refresh-history">刷新历史</button>
+        <button id="clear-history">清空历史</button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <section class="card">
+      <h2>记忆区</h2>
+      <label>术语映射（每行：中文 => English）</label>
+      <textarea id="preferredTerms" placeholder="直流输电 => HVDC"></textarea>
+      <label>禁用规则（每行一条）</label>
+      <textarea id="forbiddenTerms"></textarea>
+      <label>风格偏好（每行一条，可加标签如 [intro]）</label>
+      <textarea id="styleRules"></textarea>
+      <div class="actions-row">
+        <button id="save-memory">保存记忆</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>设置区</h2>
+      <label>模型提供商</label>
+      <div class="actions-row">
+        <select id="provider">
+          <option value="openai">OpenAI</option>
+          <option value="anthropic">Anthropic (OpenAI-Compatible)</option>
+          <option value="gemini">Google Gemini (OpenAI-Compatible)</option>
+          <option value="compatible">OpenAI-Compatible</option>
+        </select>
+        <button id="apply-provider" type="button">应用提供商预设</button>
+      </div>
+      <label>投稿风格</label>
+      <select id="targetVenue">
+        <option value="ieee">IEEE</option>
+        <option value="elsevier">Elsevier</option>
+        <option value="generic">Generic Journal</option>
+      </select>
+      <div class="actions-row" id="venueButtons">
+        <button type="button" data-venue="ieee">IEEE</button>
+        <button type="button" data-venue="elsevier">Elsevier</button>
+        <button type="button" data-venue="generic">Generic</button>
+      </div>
+      <label>学科设置</label>
+      <div class="actions-row">
+        <input id="discipline" type="text" placeholder="Power Systems / Computer Vision / NLP ..." />
+        <button id="apply-discipline" type="button">应用学科预设</button>
+      </div>
+      <label>Base URL</label>
+      <input id="baseUrl" type="text" />
+      <label>API Key</label>
+      <input id="apiKey" type="password" />
+      <label>模型名称</label>
+      <input id="model" type="text" />
+      <div class="two-col">
+        <div>
+          <label>Max tokens</label>
+          <input id="maxTokens" type="number" min="1" />
+        </div>
+        <div>
+          <label>温度</label>
+          <input id="temperature" type="number" min="0" max="2" step="0.1" />
+        </div>
+      </div>
+      <label><input id="sendLargeContext" type="checkbox" /> 发送更大上下文</label>
+      <label><input id="defaultAcademicEnglish" type="checkbox" /> 默认英文学术风格</label>
+      <label><input id="uploadErrorNearbyCode" type="checkbox" /> 上传编译错误附近代码</label>
+      <label><input id="privacyMode" type="checkbox" /> 隐私模式（不记录历史）</label>
+      <h3 class="subhead">提示词模板</h3>
+      <label>系统提示词（可选覆盖）</label>
+      <textarea id="promptSystem" placeholder="留空则使用内置默认"></textarea>
+      <label>学术改写模板</label>
+      <textarea id="promptRewrite" placeholder="留空则使用默认"></textarea>
+      <label>压缩模板</label>
+      <textarea id="promptCompress" placeholder="留空则使用默认"></textarea>
+      <label>中译英-学术重写模板</label>
+      <textarea id="promptTranslateAcademic" placeholder="留空则使用默认"></textarea>
+      <label>审稿回复模板</label>
+      <textarea id="promptRebuttal" placeholder="留空则使用默认"></textarea>
+      <div class="actions-row">
+        <button id="save-settings">保存设置</button>
+        <button id="reset-prompts" type="button">恢复默认提示词</button>
+      </div>
+    </section>
+
+    <script src="index.js"></script>
+  </body>
+</html>

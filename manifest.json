@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "Overleaf AI Helper",
+  "version": "0.1.0",
+  "description": "Local-context writing assistant for Overleaf.",
+  "permissions": ["storage", "activeTab", "scripting", "sidePanel", "clipboardWrite"],
+  "host_permissions": [
+    "https://*.overleaf.com/*",
+    "https://overleaf.com/*",
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "commands": {
+    "quick-rewrite": {
+      "description": "Quick rewrite on current selection",
+      "suggested_key": {
+        "default": "Ctrl+Shift+1",
+        "mac": "Command+Shift+1"
+      }
+    },
+    "quick-translate": {
+      "description": "Quick academic translate on current selection",
+      "suggested_key": {
+        "default": "Ctrl+Shift+2",
+        "mac": "Command+Shift+2"
+      }
+    },
+    "quick-latex-error-help": {
+      "description": "Quick LaTeX error help from visible logs",
+      "suggested_key": {
+        "default": "Ctrl+Shift+3",
+        "mac": "Command+Shift+3"
+      }
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.overleaf.com/*", "https://overleaf.com/*"],
+      "js": [
+        "content/selection.js",
+        "content/writeback.js",
+        "content/content.js",
+        "content/inline-ui.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["injected/editor-bridge.js", "core/context-extractor.js"],
+      "matches": ["https://*.overleaf.com/*", "https://overleaf.com/*"]
+    }
+  ],
+  "action": {
+    "default_title": "Overleaf AI Helper"
+  }
+}
