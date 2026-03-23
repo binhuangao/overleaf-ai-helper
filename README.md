@@ -2,10 +2,11 @@
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-green.svg) ![Chrome Extension](https://img.shields.io/badge/chrome-extension-blue) ![Manifest](https://img.shields.io/badge/manifest-v3-orange)
 
-一个面向 Overleaf 的本地 AI 写作助手。目标是把“选中 -> 提示改写 -> 确认回填”变成一步到两步。
+一个面向 Overleaf 的本地 AI 写作助手，开箱即用.
+
 English version: [README.en.md](README.en.md)
 
-## 小白快速配置（5 分钟）
+## 快速配置
 
 ### 1. 安装插件
 1. 打开 `chrome://extensions/`
@@ -24,8 +25,8 @@ English version: [README.en.md](README.en.md)
    - `OpenAI / Anthropic / Gemini / OpenAI-Compatible`
    - 点击“应用提供商预设”自动填入常见 Base URL/模型
 4. 选择投稿风格：
-   - 下拉框 `投稿风格` 或下面按钮 `IEEE / Elsevier / Generic` 二选一都可
-5. 选学科（可填 `Power Systems`）后点“应用学科预设”
+   - 从按钮 `IEEE / Elsevier / Generic` 选一即可
+5. 选学科（如 `Power Systems`）后点“应用学科预设”
 6. 点“保存设置”
 
 ### 3. 立刻使用
